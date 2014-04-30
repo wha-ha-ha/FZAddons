@@ -8,6 +8,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import factorization.shared.Core;
 import fza.base.items.FZAItemInfo;
 import fza.base.util.ColoringUtil;
 import fza.base.util.OreDictionaryUtil;
@@ -18,7 +19,7 @@ public class ItemCleanGravel extends Item{
 		super(par1);
 		setHasSubtypes(true);
 		setUnlocalizedName(FZAItemInfo.CLEAN_UNLOCALIZED_NAME);
-		setCreativeTab(CreativeTabs.tabMaterials);
+		setCreativeTab(Core.tabFactorization);
 		setNoRepair();
 	}
 	

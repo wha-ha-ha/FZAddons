@@ -10,6 +10,7 @@ import net.minecraft.util.Icon;
 import net.minecraftforge.oredict.OreDictionary;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import factorization.shared.Core;
 import fza.base.items.FZAItemInfo;
 import fza.base.util.ColoringUtil;
 import fza.base.util.OreDictionaryUtil;
@@ -20,7 +21,7 @@ public class ItemDirtyGravel extends Item {
 		super(par1);
 		setHasSubtypes(true);
 		setUnlocalizedName(FZAItemInfo.DIRTY_UNLOCALIZED_NAME);
-		setCreativeTab(CreativeTabs.tabMaterials);
+		setCreativeTab(Core.tabFactorization);
 		setNoRepair();
 	}
 	

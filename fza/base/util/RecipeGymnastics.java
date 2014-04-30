@@ -116,6 +116,13 @@ public class RecipeGymnastics {
 			TileEntityGrinder.addRecipe("oreNetherRedstone", new ItemStack(Item.redstone), 25.5F);
 		}
 		
+		if(OreDictionary.getOres("cloth").isEmpty()) {
+			for(int i = 0; i < 16; i++) {
+				OreDictionary.registerOre("cloth", new ItemStack(Block.cloth, 1, i));
+			}
+		}
+		TileEntityGrinder.addRecipe("cloth", new ItemStack(Item.silk), 3.5F);
+		
 		if(!OreDictionary.getOres("oreNetherPlatinum").isEmpty() && OreDictionary.getOres("orePlatinum").isEmpty() && !OreDictionary.getOres("ingotPlatinum").isEmpty()) {
 			TileEntityGrinder.addRecipe("oreNetherPlatinum", OreDictionary.getOres("dirtyGravelPlatinum").get(0).copy(), 4F);
 		}
@@ -152,7 +159,9 @@ public class RecipeGymnastics {
 				ArrayList<ItemStack> crystals = OreDictionary.getOres("crystalline"+ingotPostfix);
 				ItemStack crystal = crystals.get(0).copy();
 				
-				TileEntityGrinder.addRecipe("ore"+s, dirty, getGravelOutput(s));
+				if(!OreDictionary.getOres("ore"+s).isEmpty()) {
+					TileEntityGrinder.addRecipe("ore"+s, dirty, getGravelOutput(s));
+				}
 				
 				if(!OreDictionary.getOres("oreNether"+s).isEmpty()) {
 					TileEntityGrinder.addRecipe("oreNether"+s, dirty, getGravelOutput(s)*2);
@@ -206,34 +215,30 @@ public class RecipeGymnastics {
 	}
 	
 	private static float getDustOutput(String postfix) {
-		if(postfix.equals("Bauxite")) {
-			return 40F;
-		}
-		if(postfix.equals("Sodalite")) {
-			return 12F;
-		}
-		if(postfix.equals("Saltpeter") || postfix.equals("Sulfur")) {
-			return 8.25F;
+		float mult = 1F;
+		if(ConfigurationHandler.customOreMults.containsKey(postfix)) {
+			mult = ConfigurationHandler.customOreMults.get(postfix);
 		}
 		
-		return 2F;
+		return 2F * mult;
 	}
 	
 	private static float getGemOutput(String postfix) {
-		if(postfix.equals("Apatite")) {
-			return 12F;
+		float mult = 1F;
+		if(ConfigurationHandler.customOreMults.containsKey(postfix)) {
+			mult = ConfigurationHandler.customOreMults.get(postfix);
 		}
 		
-		return 2.5F;
+		return 2.5F * mult;
 	}
 	
 	private static float getGravelOutput(String postfix) {
-		if(postfix.equals("Cassiterite")) {
-			return 4F;
-			
+		float mult = 1F;
+		if(ConfigurationHandler.customOreMults.containsKey(postfix)) {
+			mult = ConfigurationHandler.customOreMults.get(postfix);
 		}
 		
-		return 2F;
+		return 2F * mult;
 	}
 	
 	private static void doSlagFurnaceShenanigans() {
@@ -302,7 +307,10 @@ public class RecipeGymnastics {
 				ArrayList<ItemStack> ingots = OreDictionary.getOres("ingot"+OreDictionaryUtil.ingotTransforms.get(s));
 				if(!ingots.isEmpty()) {
 					for(ItemStack stack : ores) {
-						float mult = s.equals("Cassiterite") ? 2F : 1F;
+						float mult = 1F;
+						if(ConfigurationHandler.customOreMults.containsKey(s)) {
+							mult = ConfigurationHandler.customOreMults.get(s);
+						}
 						TileEntitySlagFurnace.SlagRecipes.register(stack.copy(), 1.2F*mult, ingots.get(0).copy(), .4F, Block.stone);
 					}
 					ArrayList<ItemStack> nethers = OreDictionary.getOres("oreNether"+s);

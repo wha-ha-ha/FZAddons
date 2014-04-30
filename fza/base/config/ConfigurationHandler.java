@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 
 import net.minecraftforge.common.Configuration;
@@ -17,6 +18,8 @@ public class ConfigurationHandler {
 	
 	private static File cfg;
 	public static final HashSet<String> smeltingBlackList = new HashSet<String>();
+	public static final HashMap<String, Float> customOreMults = new HashMap<String, Float>();
+	public static String[] customIngotMappings;
 	
 	public static void init(File file) {
 		
@@ -25,10 +28,10 @@ public class ConfigurationHandler {
 		Configuration config = new Configuration(file);
 		config.load();
 
-		FZAItemInfo.DIRTY_ID = config.getItem(FZAItemInfo.DIRTY_KEY, FZAItemInfo.DIRTY_DEFAULT).getInt();
-		FZAItemInfo.CLEAN_ID = config.getItem(FZAItemInfo.CLEAN_KEY, FZAItemInfo.CLEAN_DEFAULT).getInt();
-		FZAItemInfo.REDUCED_ID = config.getItem(FZAItemInfo.REDUCED_KEY, FZAItemInfo.REDUCED_DEFAULT).getInt();
-		FZAItemInfo.CRYSTAL_ID = config.getItem(FZAItemInfo.CRYSTAL_KEY, FZAItemInfo.CRYSTAL_DEFAULT).getInt();
+		FZAItemInfo.DIRTY_ID = config.getItem(FZAItemInfo.DIRTY_KEY, FZAItemInfo.DIRTY_DEFAULT).getInt() - 256;
+		FZAItemInfo.CLEAN_ID = config.getItem(FZAItemInfo.CLEAN_KEY, FZAItemInfo.CLEAN_DEFAULT).getInt() - 256;
+		FZAItemInfo.REDUCED_ID = config.getItem(FZAItemInfo.REDUCED_KEY, FZAItemInfo.REDUCED_DEFAULT).getInt() - 256;
+		FZAItemInfo.CRYSTAL_ID = config.getItem(FZAItemInfo.CRYSTAL_KEY, FZAItemInfo.CRYSTAL_DEFAULT).getInt() - 256;
 		
 		for(String s : config.get("SMELTING BLACKLIST", "smeltingBlacklist",
 				new String[]{
@@ -45,6 +48,29 @@ public class ConfigurationHandler {
 				"Ore dict names to keep from smelting into ingots.").getStringList()) {
 			
 			smeltingBlackList.add(s);
+			
+		}
+		
+		for(String s : config.get("CUSTOM ORE OUTPUT MULTIPLIERS", "customOreMults",
+				new String[]{
+				
+				"Bauxite:20",
+				"Sodalite:6",
+				"Saltpeter:4.125",
+				"Sulfur:4.125",
+				"Apatite:4.8",
+				"Cassiterite:2"
+				
+				}, 
+				"Specify ore types whose direct outputs (putting the ore directly in a machine) should be multiplied by a certain amount.\nDusts and gravels default out to 2x from the lacerator,\nGems default out to 2.5x from the lacerator.\nIf you wanted, say 12 gems out of an ore, you'd want to divide that number by the default (12/2.5) and put that result here.").getStringList()) {
+			
+			try {
+				String[] split = s.split(":");
+				float mult = Float.parseFloat(split[1]);
+				customOreMults.put(split[0], mult);
+			}catch(Throwable t) {
+				System.err.println("GOT BAD CUSTOM ORE OUTPUT CONFIG "+s);
+			}
 			
 		}
 		
@@ -69,6 +95,22 @@ public class ConfigurationHandler {
 				
 				}, 
 				"Hex color values for this mod's meta items.\nFormat: DictPostfix:HexValue - e.g. Osmium:699BD1").getStringList();
+		
+		customIngotMappings = config.get("CUSTOM ORE MAPPINGS", "customOreMappings",
+				new String[]{
+				
+				"Tungstate:Tungsten",
+				"Sphalerite:Sphalerite",
+				"Zinc:Zinc",
+				"Tetrahedrite:Copper",
+				"Galena:Lead",
+				"Cassiterite:Tin",
+				"Pyrite:Pyrite",
+				"Cooperite:Platinum",
+				"Yellorite:Yellorium"
+				
+				}, 
+				"Map ore dict postfixes for ore types to metal types coming from them that are different from their ore types OR that don't have an ingot.").getStringList();
 		
 		ColoringUtil.init(rawColorStringArray);
 		

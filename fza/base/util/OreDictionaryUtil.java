@@ -9,6 +9,7 @@ import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraftforge.oredict.OreDictionary;
 import factorization.oreprocessing.TileEntityGrinder;
 import factorization.oreprocessing.TileEntityGrinder.GrinderRecipe;
+import fza.base.config.ConfigurationHandler;
 
 public class OreDictionaryUtil {
 
@@ -45,47 +46,16 @@ public class OreDictionaryUtil {
 			}
 		}
 		
-		if(!OreDictionary.getOres("oreTungstate").isEmpty() && !OreDictionary.getOres("ingotTungsten").isEmpty()) {
-			ingotTransforms.put("Tungstate", "Tungsten");
-		}
-		
-		if(!OreDictionary.getOres("oreCooperite").isEmpty() && !OreDictionary.getOres("ingotPlatinum").isEmpty()) {
-			ingotTransforms.put("Cooperite", "Platinum");
-		}
-		
-		if(!OreDictionary.getOres("oreTetrahedrite").isEmpty() && !OreDictionary.getOres("ingotCopper").isEmpty()) {
-			ingotTransforms.put("Tetrahedrite", "Copper");
-		}
-		
-		if(!OreDictionary.getOres("oreGalena").isEmpty() && !OreDictionary.getOres("ingotSilver").isEmpty() && !OreDictionary.getOres("ingotLead").isEmpty()) {
-			ingotTransforms.put("Galena", "Lead");
-		}
-		
-		if(!OreDictionary.getOres("oreCassiterite").isEmpty() && !OreDictionary.getOres("ingotTin").isEmpty()) {
-			ingotTransforms.put("Cassiterite", "Tin");
-		}
-		
-		if(!OreDictionary.getOres("orePyrite").isEmpty() && !OreDictionary.getOres("ingotIron").isEmpty()) {
-			ingotTransforms.put("Pyrite", "Pyrite");
-		}
-		
-		if(!OreDictionary.getOres("oreSphalerite").isEmpty() && !OreDictionary.getOres("ingotZinc").isEmpty()) {
-			int index = ("Zinc".hashCode() % ORENAME_HASHSPACE/2) + ORENAME_HASHSPACE/2;
-			postfixes[index] = "Zinc";
-			ingotTransforms.put("Sphalerite", "Sphalerite");
-			ingotTransforms.put("Zinc", "Zinc");
-		}
-		
-		if(!OreDictionary.getOres("oreYellorite").isEmpty()) {
-			ItemStack smelt = FurnaceRecipes.smelting().getSmeltingResult(OreDictionary.getOres("oreYellorite").get(0));
-			if(smelt != null) {
-				int oreid = OreDictionary.getOreID(smelt);
-				if(oreid != -1) {
-					String name = OreDictionary.getOreName(oreid);
-					if(name.startsWith("ingot")) {
-						ingotTransforms.put("Yellorite", name.substring(5));
-					}
+		for(String s : ConfigurationHandler.customIngotMappings) {
+			try {
+				String[] ingotSplit = s.split(":");
+				if(!OreDictionary.getOres("ore"+ingotSplit[0]).isEmpty() || !OreDictionary.getOres("ingot"+ingotSplit[1]).isEmpty()) {
+					int index = (ingotSplit[0].hashCode() % ORENAME_HASHSPACE/2) + ORENAME_HASHSPACE/2;
+					postfixes[index] = ingotSplit[0];
+					ingotTransforms.put(ingotSplit[0], ingotSplit[1]);
 				}
+			}catch(Throwable t) {
+				System.err.println("GOT BAD CUSTOM ORE TRANSFORM CONFIG "+s);
 			}
 		}
 		

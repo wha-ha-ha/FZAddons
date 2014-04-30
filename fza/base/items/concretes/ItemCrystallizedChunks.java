@@ -4,6 +4,7 @@ import java.util.List;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import factorization.shared.Core;
 import fza.base.items.FZAItemInfo;
 import fza.base.util.ColoringUtil;
 import fza.base.util.OreDictionaryUtil;
@@ -18,7 +19,7 @@ public class ItemCrystallizedChunks extends Item{
 		super(par1);
 		setHasSubtypes(true);
 		setUnlocalizedName(FZAItemInfo.CRYSTAL_UNLOCALIZED_NAME);
-		setCreativeTab(CreativeTabs.tabMaterials);
+		setCreativeTab(Core.tabFactorization);
 		setNoRepair();
 	}
 	
