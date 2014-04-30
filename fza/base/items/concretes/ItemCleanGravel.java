@@ -45,7 +45,7 @@ public class ItemCleanGravel extends Item{
 		for(int i = 0; i < OreDictionaryUtil.postfixes.length; i++) {
 			if(OreDictionaryUtil.postfixes[i] != null) {
 				String postfix = OreDictionaryUtil.postfixes[i];
-				if(OreDictionaryUtil.ingotTransforms.containsKey(postfix) && !OreDictionaryUtil.forbiddens.contains(postfix)) {
+				if(OreDictionaryUtil.ingotTransforms.containsKey(postfix) && !OreDictionaryUtil.forbiddens.contains(OreDictionaryUtil.ingotTransforms.get(postfix))) {
 					list.add(new ItemStack(this, 1, i));
 				}
 			}

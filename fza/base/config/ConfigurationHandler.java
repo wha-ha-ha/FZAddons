@@ -6,15 +6,17 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import net.minecraftforge.common.Configuration;
 import fza.base.items.FZAItemInfo;
 import fza.base.util.ColoringUtil;
+import fza.base.util.SlagParser;
 
 public class ConfigurationHandler {
 	
 	private static File cfg;
-	
+	public static final HashSet<String> smeltingBlackList = new HashSet<String>();
 	
 	public static void init(File file) {
 		
@@ -28,9 +30,69 @@ public class ConfigurationHandler {
 		FZAItemInfo.REDUCED_ID = config.getItem(FZAItemInfo.REDUCED_KEY, FZAItemInfo.REDUCED_DEFAULT).getInt();
 		FZAItemInfo.CRYSTAL_ID = config.getItem(FZAItemInfo.CRYSTAL_KEY, FZAItemInfo.CRYSTAL_DEFAULT).getInt();
 		
-		String[] rawColorStringArray = config.get("ORE COLORS", "colors", new String[]{"Osmium:699BD1", "Nickel:C4C795", "Platinum:40D6FF"}, 
+		for(String s : config.get("SMELTING BLACKLIST", "smeltingBlacklist",
+				new String[]{
+				
+				"dirtyGravelTungsten",
+				"cleanGravelTungsten",
+				"oreTungsten",
+				"oreTungstate",
+				"reducedTungsten",
+				"dirtyGravelSilver",
+				"cleanGravelSilver"
+				
+				}, 
+				"Ore dict names to keep from smelting into ingots.").getStringList()) {
+			
+			smeltingBlackList.add(s);
+			
+		}
+		
+		String[] rawColorStringArray = config.get("ORE COLORS", "colors",
+				new String[]{
+				
+				"Osmium:699BD1",
+				"Nickel:DED897",
+				"Platinum:0AE7FF",
+				"Cooperite:0AE7FF",
+				"Yellorium:C8DB1A",
+				"Yellorite:C8DB1A",
+				"Iridium:FFFFFF",
+				"Tungsten:20132B",
+				"Tungstate:20132B",
+				"Pyrite:DB613B",
+				"Zinc:FFDEDE",
+				"Uranium:59944E",
+				"Aluminum:B4E7ED",
+				"Aluminium:B4E7ED",
+				"Sphalerite:B8963B"
+				
+				}, 
 				"Hex color values for this mod's meta items.\nFormat: DictPostfix:HexValue - e.g. Osmium:699BD1").getStringList();
+		
 		ColoringUtil.init(rawColorStringArray);
+		
+		String[] slagConfigs = config.get("CUSTOM SLAG FURNACE RECIPES", "customSlag",
+				new String[]{
+				
+				"cleanGravelSphalerite:reducedZinc:.5:dustSulfur:1:.25",
+				"cleanGravelPyrite:reducedIron:.5:dustSulfur:1:.25",
+				"cleanGravelGalena:reducedSilver:1.25:reducedLead:1.25:.625",
+				"cleanGravelCopper:reducedCopper:1.25:reducedGold:.065:.625",
+				"cleanGravelLead:reducedLead:1.25:reducedSilver:.065:.625",
+				"cleanGravelGold:reducedGold:1.25:reducedSilver:.065:.625",
+				"cleanGravelIron:reducedIron:1.25:reducedNickel:.065:.625",
+				"cleanGravelTin:reducedTin:1.25:reducedIron:.065:.625",
+				"cleanGravelNickel:reducedNickel:1.25:reducedPlatinum:.065:.625",
+				"cleanGravelPlatinum:reducedPlatinum:1.25:reducedIridium:.065:.625",
+				"cleanGravelTungsten:reducedTungsten:1.25:dustManganese:.065:.625",
+				"cleanGravelUranium:reducedUranium:1.25:dustPlutonium:.065:.625",
+				"cleanGravelTin:reducedTin:1.25:reducedIron:.065:.625"
+				
+				},
+				"Specify custom Slag Furnace recipes! Format:\ninputOreDictName:mainOutputOreDictName:mainOutputAmount:secondaryOutputOreDictName:secondaryOutputAmount:fallBackAmount\n\"Fallback\" amount specifies a multiplier to use when putting the main output into both output slots,\nin the event that the secondary output doesn't exist in the ore dictionary.\n\nTHIS IS JUST FOR ADDING FANCY RECIPES FOR THINGS.\n If an ore dicted ore has a corresponding ingot and isn't specified here, the mod will automatically generate slag recipes for it, so don't worry!").getStringList();
+		
+		SlagParser.initCustomRecipes(slagConfigs);
 		
 		config.save();
 	}

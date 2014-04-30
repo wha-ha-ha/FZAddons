@@ -11,14 +11,16 @@ public class ColoringUtil {
 			try {
 				String[] split = s.split(":");
 				colors.put(split[0], Integer.parseInt(split[1], 16));
-			}catch(Throwable t){}
+			}catch(Throwable t){
+				System.err.println("GOT BAD ORE COLORING CONFIG "+s);
+			}
 		}
 	}
 	
 	public static int getColorFromPostFix(String postfix) {
-		if(postfix == null) return 0xB8B8B8;
+		if(postfix == null) return 0xBAB5AF;
 		
-		return colors.containsKey(postfix) ? colors.get(postfix) : 0xB8B8B8;
+		return colors.containsKey(postfix) ? colors.get(postfix) : 0xBAB5AF;
 	}
 	
 }

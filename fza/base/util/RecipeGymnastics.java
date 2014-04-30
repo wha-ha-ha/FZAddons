@@ -17,6 +17,8 @@ import factorization.oreprocessing.TileEntityGrinder.GrinderRecipe;
 import factorization.oreprocessing.TileEntitySlagFurnace;
 import factorization.oreprocessing.TileEntitySlagFurnace.SmeltingResult;
 import factorization.shared.Core;
+import fza.base.config.ConfigurationHandler;
+import fza.base.config.SlagConfigOption;
 
 public class RecipeGymnastics {
 
@@ -28,6 +30,7 @@ public class RecipeGymnastics {
 		addGemRecipes();
 		addDustRecipes();
 		doSlagFurnaceShenanigans();
+		addSmeltingAndCrystallizing();
 		
 	}
 	
@@ -155,19 +158,6 @@ public class RecipeGymnastics {
 					TileEntityGrinder.addRecipe("oreNether"+s, dirty, getGravelOutput(s)*2);
 				}
 				
-				if(!OreDictionary.getOres("ingot"+ingotPostfix).isEmpty()) {
-					ItemStack ingot = OreDictionary.getOres("ingot"+ingotPostfix).get(OreDictionary.getOres("ingot"+ingotPostfix).size()-1).copy();
-					ingot.stackSize = 1;
-					
-					TileEntitySlagFurnace.SlagRecipes.register(dirty, 1.1F, ingot, .2F, new ItemStack(Block.dirt));
-					TileEntityCrystallizer.addRecipe(reduced, crystal, 1.2F, Core.registry.aqua_regia);
-					
-					FurnaceRecipes.smelting().addSmelting(dirty.itemID, dirty.getItemDamage(), ingot, 0.1F);
-					FurnaceRecipes.smelting().addSmelting(clean.itemID, clean.getItemDamage(), ingot, 0.1F);
-					FurnaceRecipes.smelting().addSmelting(reduced.itemID, reduced.getItemDamage(), ingot, 0.1F);
-					FurnaceRecipes.smelting().addSmelting(crystal.itemID, crystal.getItemDamage(), ingot, 0.1F);
-				}
-				
 				processed.add(ingotPostfix);
 			}
 
@@ -249,37 +239,40 @@ public class RecipeGymnastics {
 	private static void doSlagFurnaceShenanigans() {
 		
 		doSlagPrep();
+		HashSet<String> customParsed = new HashSet<String>();
+		
+		for(SlagConfigOption option : SlagParser.customSlagRecipes) {
+			
+			if(!OreDictionary.getOres(option.in).isEmpty() && !OreDictionary.getOres(option.mainOut).isEmpty()) {
+				
+				if(!OreDictionary.getOres(option.secondOut).isEmpty()) {
+					addSlagRecipe(option.in, option.secondMult, option.secondOut, option.mainMult, option.mainOut);
+				}else {
+					addSlagRecipe(option.in, option.fallbackMult, option.mainOut, option.fallbackMult, option.mainOut);
+				}
+				
+				customParsed.add(option.in);
+				
+			}
+			
+		}
+		
 		for(String s : OreDictionary.getOreNames()) {
-			if(s.startsWith("cleanGravel") && !s.equals("cleanGravelSilver")) {
+			if(s.startsWith("cleanGravel") && !s.equals("cleanGravelSilver") && !customParsed.contains(s)) {
 				
 				String postfix = s.substring(11);
 				
 				ArrayList<ItemStack> cleans = OreDictionary.getOres(s);
 				if(!cleans.isEmpty()) {
 					
-					String dirty = "dirtyGravel"+postfix;
-					ArrayList<ItemStack> dirties = OreDictionary.getOres(dirty);
-					if(!dirties.isEmpty()) {
-						ItemStack clean = cleans.get(0).copy();
-						GameRegistry.addRecipe(new ShapelessOreRecipe(clean, new Object[] { "fz.waterBucketLike", dirty }));
-						clean.stackSize = 8;
-						GameRegistry.addRecipe(new ShapelessOreRecipe(clean, new Object[] { "fz.waterBucketLike", dirty, dirty, dirty, dirty, dirty, dirty, dirty, dirty }));
-					}
-					
 					ArrayList<ItemStack> ingots = OreDictionary.getOres("ingot"+postfix);
 					ArrayList<ItemStack> reduceds = OreDictionary.getOres("reduced"+postfix);
 					
 					if(!ingots.isEmpty() && !reduceds.isEmpty()) {
 						ItemStack out2 = reduceds.get(0).copy();
-						ItemStack out1 = SlagParser.getBonusFromPostfix(postfix);
+						ItemStack out1 = out2;
 						float chance2 = .625F;
 						float chance1 = .625F;
-						if(out1 == null) {
-							out1 = out2;
-						}else {
-							chance2 = 1.25F;
-							chance1 = 0.065F;
-						}
 						addSlagRecipe(s, chance1, out1, chance2, out2);
 					}
 					
@@ -305,7 +298,7 @@ public class RecipeGymnastics {
 		
 		for(String s : OreDictionaryUtil.ingotTransforms.keySet()) {
 			ArrayList<ItemStack> ores = OreDictionary.getOres("ore"+s);
-			if(!ores.isEmpty()) {
+			if(!ores.isEmpty() && !ConfigurationHandler.smeltingBlackList.contains("ore"+s)) {
 				ArrayList<ItemStack> ingots = OreDictionary.getOres("ingot"+OreDictionaryUtil.ingotTransforms.get(s));
 				if(!ingots.isEmpty()) {
 					for(ItemStack stack : ores) {
@@ -346,53 +339,82 @@ public class RecipeGymnastics {
 			}
 		}
 		
-		if(!OreDictionary.getOres("cleanGravelSphalerite").isEmpty() && !OreDictionary.getOres("reducedZinc").isEmpty()) {
-			for(ItemStack sphal : OreDictionary.getOres("cleanGravelSphalerite")) {
-				ItemStack zinc = OreDictionary.getOres("reducedZinc").get(0).copy();
-				float mult = .25F;
-				float secondMult = .25F;
-				ItemStack second = zinc;
-				if(!OreDictionary.getOres("dustSulfur").isEmpty()) {
-					second = OreDictionary.getOres("dustSulfur").get(0).copy();
-				}
-				if(OreDictionary.getOreID(second) == OreDictionary.getOreID("dustSulfur")) {
-					mult = .5F;
-					secondMult = 1F;
-				}
-				TileEntitySlagFurnace.SlagRecipes.register(sphal, mult, zinc, secondMult, second);
-			}
-			ItemStack in = OreDictionary.getOres("cleanGravelSphalerite").get(0).copy();
-			if(!OreDictionary.getOres("ingotZinc").isEmpty()) {
-				FurnaceRecipes.smelting().addSmelting(in.itemID, in.getItemDamage(), OreDictionary.getOres("ingotZinc").get(0).copy(), .1F);
-			}
-		}
-		
-		if(!OreDictionary.getOres("cleanGravelPyrite").isEmpty() && !OreDictionary.getOres("reducedIron").isEmpty()) {
-			for(ItemStack pyr : OreDictionary.getOres("cleanGravelPyrite")) {
-				ItemStack iron = OreDictionary.getOres("reducedIron").get(0).copy();
-				float mult = .25F;
-				float secondMult = .25F;
-				ItemStack second = iron;
-				if(!OreDictionary.getOres("dustSulfur").isEmpty()) {
-					second = OreDictionary.getOres("dustSulfur").get(0).copy();
-				}
-				if(OreDictionary.getOreID(second) == OreDictionary.getOreID("dustSulfur")) {
-					mult = .5F;
-					secondMult = 1F;
-				}
-				TileEntitySlagFurnace.SlagRecipes.register(pyr, mult, iron, secondMult, second);
-			}
-			ItemStack in = OreDictionary.getOres("cleanGravelPyrite").get(0).copy();
-			FurnaceRecipes.smelting().addSmelting(in.itemID, in.getItemDamage(), new ItemStack(Item.ingotIron), .1F);
-		}
-		
 		addSlagRecipe("cleanGravelGalena", 1.25F, OreDictionary.getOres("reducedSilver").get(0).copy(),  1.25F, OreDictionary.getOres("reducedLead").get(0).copy());
+		
+	}
+	
+	public static void addSmeltingAndCrystallizing() {
+		
+		for(String s : OreDictionary.getOreNames()) {
+			
+			if(s.startsWith("dirtyGravel") && !OreDictionary.getOres(s).isEmpty()) {
+				String postfix = s.substring(11);
+				if(!ConfigurationHandler.smeltingBlackList.contains(s)) {
+					ArrayList<ItemStack> ingots = OreDictionary.getOres("ingot"+postfix);
+					if(!ingots.isEmpty()) {
+						ItemStack ingot = OreDictionary.getOres("ingot"+postfix).get(0).copy();
+						ingot.stackSize = 1;
+						ItemStack dirty = OreDictionary.getOres(s).get(0).copy();
+						TileEntitySlagFurnace.SlagRecipes.register(dirty, 1.1F, ingot, .2F, new ItemStack(Block.dirt));
+						FurnaceRecipes.smelting().addSmelting(dirty.itemID, dirty.getItemDamage(), ingot, 0.1F);
+					}
+				}
+				
+				ArrayList<ItemStack> cleans = OreDictionary.getOres("cleanGravel"+postfix);
+				if(!cleans.isEmpty()) {
+					ItemStack dirty = OreDictionary.getOres(s).get(0).copy();
+					ItemStack clean = cleans.get(0).copy();
+					GameRegistry.addRecipe(new ShapelessOreRecipe(clean, new Object[] { "fz.waterBucketLike", dirty }));
+					clean.stackSize = 8;
+					GameRegistry.addRecipe(new ShapelessOreRecipe(clean, new Object[] { "fz.waterBucketLike", dirty, dirty, dirty, dirty, dirty, dirty, dirty, dirty }));
+				}
+				
+			}
+			
+			else if(s.startsWith("cleanGravel") && !OreDictionary.getOres(s).isEmpty() && !ConfigurationHandler.smeltingBlackList.contains(s)) {
+				String postfix = s.substring(11);
+				if(!OreDictionary.getOres("ingot"+postfix).isEmpty()) {
+					ItemStack clean = OreDictionary.getOres(s).get(0).copy();
+					ItemStack ingot = OreDictionary.getOres("ingot"+postfix).get(0).copy();
+					FurnaceRecipes.smelting().addSmelting(clean.itemID, clean.getItemDamage(), ingot, 0.1F);
+				}
+			}
+			
+			else if(s.startsWith("reduced") && !OreDictionary.getOres(s).isEmpty()) {
+				ItemStack reduced = OreDictionary.getOres(s).get(0).copy();
+				String postfix = s.substring(7);
+				if(!OreDictionary.getOres("crystalline"+postfix).isEmpty()) {
+					ItemStack crystal = OreDictionary.getOres("crystalline"+postfix).get(0).copy();
+					TileEntityCrystallizer.addRecipe(reduced, crystal, 1.2F, Core.registry.aqua_regia);
+				}
+				if(!ConfigurationHandler.smeltingBlackList.contains(s) && !OreDictionary.getOres("ingot"+postfix).isEmpty()) {
+					ItemStack ingot = OreDictionary.getOres("ingot"+postfix).get(0).copy();
+					FurnaceRecipes.smelting().addSmelting(reduced.itemID, reduced.getItemDamage(), ingot, 0.1F);
+				}
+			}
+			
+			else if(s.startsWith("crystalline") && !OreDictionary.getOres(s).isEmpty() && !ConfigurationHandler.smeltingBlackList.contains(s)) {
+				String postfix = s.substring(11);
+				if(!OreDictionary.getOres("ingot"+postfix).isEmpty()) {
+					ItemStack crystal = OreDictionary.getOres(s).get(0).copy();
+					ItemStack ingot = OreDictionary.getOres("ingot"+postfix).get(0).copy();
+					FurnaceRecipes.smelting().addSmelting(crystal.itemID, crystal.getItemDamage(), ingot, 0.1F);
+				}
+			}
+			
+		}
 		
 	}
 	
 	private static void addSlagRecipe(String dictIn, float mult1, ItemStack out1, float mult2, ItemStack out2) {
 		if(!OreDictionary.getOres(dictIn).isEmpty()) {
 			TileEntitySlagFurnace.SlagRecipes.register(OreDictionary.getOres(dictIn).get(0).copy(), mult1, out1, mult2, out2);
+		}
+	}
+	
+	private static void addSlagRecipe(String dictIn, float mult1, String dictOut1, float mult2, String dictOut2) {
+		if(!OreDictionary.getOres(dictIn).isEmpty()) {
+			TileEntitySlagFurnace.SlagRecipes.register(OreDictionary.getOres(dictIn).get(0).copy(), mult1, OreDictionary.getOres(dictOut1).get(0).copy(), mult2, OreDictionary.getOres(dictOut2).get(0).copy());
 		}
 	}
 	
