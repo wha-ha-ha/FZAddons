@@ -139,35 +139,28 @@ public class RecipeGymnastics {
 	
 	private static void addMetalRecipes() {
 		
-		HashSet<String> processed = new HashSet<String>();
-		
 		for(String s : OreDictionaryUtil.ingotTransforms.keySet()) {
 			
 			String ingotPostfix = OreDictionaryUtil.ingotTransforms.get(s);
 			
-			if(!OreDictionaryUtil.forbiddens.contains(ingotPostfix) && !processed.contains(ingotPostfix)) {
-				
-				ArrayList<ItemStack> dirties = OreDictionary.getOres("dirtyGravel"+ingotPostfix);
-				ItemStack dirty = dirties.get(0).copy();
-				
-				ArrayList<ItemStack> cleans = OreDictionary.getOres("cleanGravel"+ingotPostfix);
-				ItemStack clean = cleans.get(0).copy();
-				
-				ArrayList<ItemStack> reduceds = OreDictionary.getOres("reduced"+ingotPostfix);
-				ItemStack reduced = reduceds.get(0).copy();
-				
-				ArrayList<ItemStack> crystals = OreDictionary.getOres("crystalline"+ingotPostfix);
-				ItemStack crystal = crystals.get(0).copy();
-				
-				if(!OreDictionary.getOres("ore"+s).isEmpty()) {
-					TileEntityGrinder.addRecipe("ore"+s, dirty, getGravelOutput(s));
-				}
-				
-				if(!OreDictionary.getOres("oreNether"+s).isEmpty()) {
-					TileEntityGrinder.addRecipe("oreNether"+s, dirty, getGravelOutput(s)*2);
-				}
-				
-				processed.add(ingotPostfix);
+			ArrayList<ItemStack> dirties = OreDictionary.getOres("dirtyGravel"+ingotPostfix);
+			ItemStack dirty = dirties.get(0).copy();
+			
+			ArrayList<ItemStack> cleans = OreDictionary.getOres("cleanGravel"+ingotPostfix);
+			ItemStack clean = cleans.get(0).copy();
+			
+			ArrayList<ItemStack> reduceds = OreDictionary.getOres("reduced"+ingotPostfix);
+			ItemStack reduced = reduceds.get(0).copy();
+			
+			ArrayList<ItemStack> crystals = OreDictionary.getOres("crystalline"+ingotPostfix);
+			ItemStack crystal = crystals.get(0).copy();
+			
+			if(!OreDictionary.getOres("ore"+s).isEmpty()) {
+				TileEntityGrinder.addRecipe("ore"+s, dirty, getGravelOutput(s));
+			}
+			
+			if(!OreDictionary.getOres("oreNether"+s).isEmpty()) {
+				TileEntityGrinder.addRecipe("oreNether"+s, dirty, getGravelOutput(s)*2);
 			}
 
 		}
