@@ -11,8 +11,10 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkMod;
+import factorization.shared.Core;
 import fza.base.config.ConfigurationHandler;
 import fza.base.items.FZAItems;
+import fza.base.items.concretes.ItemWrathIgniterOverride;
 import fza.base.proxy.CommonProxy;
 import fza.base.proxy.PacketHandler;
 import fza.base.util.ColoringUtil;
@@ -52,5 +54,8 @@ public class FZAddons {
 		FZAItems.registerOreDict();
 		RecipeGymnastics.initBase();
 		RecipeGymnastics.doGymnastics();
+		if(ConfigurationHandler.wrathIgniterRevert) {
+			RecipeGymnastics.revertDarkIronRecipes();
+		}
 	}
 }

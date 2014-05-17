@@ -3,11 +3,14 @@ package fza.base.util;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.ListIterator;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.FurnaceRecipes;
+import net.minecraft.item.crafting.IRecipe;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 import cpw.mods.fml.common.registry.GameRegistry;
@@ -416,6 +419,30 @@ public class RecipeGymnastics {
 	private static void addSlagRecipe(String dictIn, float mult1, String dictOut1, float mult2, String dictOut2) {
 		if(!OreDictionary.getOres(dictIn).isEmpty()) {
 			TileEntitySlagFurnace.SlagRecipes.register(OreDictionary.getOres(dictIn).get(0).copy(), mult1, OreDictionary.getOres(dictOut1).get(0).copy(), mult2, OreDictionary.getOres(dictOut2).get(0).copy());
+		}
+	}
+
+	public static void revertDarkIronRecipes() {
+		
+		ListIterator<IRecipe> iterator = CraftingManager.getInstance().getRecipeList().listIterator();
+		while(iterator.hasNext()) {
+			IRecipe r = iterator.next();
+			if(canRemoveRecipe(r)) {
+				System.out.println("Removing recipe for "+r.getRecipeOutput().getDisplayName());
+				iterator.remove();
+			}
+		}
+		
+		GameRegistry.addShapelessRecipe(new ItemStack(Core.registry.dark_iron, 4), new ItemStack(Core.registry.dark_iron_block_item.getItem(), 1, 3));
+
+	}
+	
+	private static boolean canRemoveRecipe(IRecipe r) {
+		try {
+			ItemStack output = r.getRecipeOutput();
+			return (output.itemID == Core.registry.dark_iron.itemID && ItemStack.areItemStacksEqual(output, StackUtil.getDuplicateStackOfSize(9, output))) || (output.itemID == Core.registry.dark_iron_block_item.itemID && output.getItemDamage() == 3);
+		}catch (Throwable e) {
+			return false;
 		}
 	}
 	

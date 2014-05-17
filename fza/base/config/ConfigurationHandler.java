@@ -20,6 +20,7 @@ public class ConfigurationHandler {
 	public static final HashSet<String> smeltingBlackList = new HashSet<String>();
 	public static final HashMap<String, Float> customOreMults = new HashMap<String, Float>();
 	public static String[] customIngotMappings;
+	public static boolean wrathIgniterRevert;
 	
 	public static void init(File file) {
 		
@@ -32,6 +33,8 @@ public class ConfigurationHandler {
 		FZAItemInfo.CLEAN_ID = config.getItem(FZAItemInfo.CLEAN_KEY, FZAItemInfo.CLEAN_DEFAULT).getInt() - 256;
 		FZAItemInfo.REDUCED_ID = config.getItem(FZAItemInfo.REDUCED_KEY, FZAItemInfo.REDUCED_DEFAULT).getInt() - 256;
 		FZAItemInfo.CRYSTAL_ID = config.getItem(FZAItemInfo.CRYSTAL_KEY, FZAItemInfo.CRYSTAL_DEFAULT).getInt() - 256;
+		
+		wrathIgniterRevert = config.get("OPTIONS", "wrathIgniterRevert", true, "Overrides the Wrath Igniter to make it spawn Wrath Fire and burn Iron Blocks to Dark Iron again!").getBoolean(true);
 		
 		for(String s : config.get("SMELTING BLACKLIST", "smeltingBlacklist",
 				new String[]{
