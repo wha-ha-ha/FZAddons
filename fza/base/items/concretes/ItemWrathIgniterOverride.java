@@ -1,14 +1,12 @@
 package fza.base.items.concretes;
 
-import java.util.List;
-
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
-import factorization.shared.Core;
 import factorization.wrath.ItemWrathIgniter;
 import factorization.wrath.TileEntityWrathFire;
 
@@ -16,7 +14,7 @@ public class ItemWrathIgniterOverride extends ItemWrathIgniter {
 
 	public ItemWrathIgniterOverride(int par1) {
 		super(par1);
-		setUnlocalizedName("FZA:WrathIgniter");
+		this.setUnlocalizedName("FZA:WrathIgniter");
 	}
 	
 	@SideOnly(Side.CLIENT)
@@ -37,10 +35,16 @@ public class ItemWrathIgniterOverride extends ItemWrathIgniter {
 		TileEntityWrathFire.ignite(baseBlock, fireBlock, player);
 		return true;
 	}
-	
-	@Override
-	public String getUnlocalizedName() {
-		return "FZA:WrathIgniter";
-	}
+
+    @Override
+    public String getUnlocalizedName() {
+        return "FZA:WrathIgniter";
+    }
+
+    @Override
+    public Item setUnlocalizedName (String par1Str)
+    {
+        return this;
+    }
 
 }

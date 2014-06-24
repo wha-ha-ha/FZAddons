@@ -3,7 +3,6 @@ package fza.base.items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
-import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 import factorization.shared.Core;
 import fza.base.config.ConfigurationHandler;
@@ -13,7 +12,6 @@ import fza.base.items.concretes.ItemDirtyGravel;
 import fza.base.items.concretes.ItemReducedChunks;
 import fza.base.items.concretes.ItemWrathIgniterOverride;
 import fza.base.util.OreDictionaryUtil;
-import fza.base.util.RecipeGymnastics;
 
 
 public class FZAItems {
@@ -29,7 +27,7 @@ public class FZAItems {
 		reduced = new ItemReducedChunks(FZAItemInfo.REDUCED_ID);
 		crystal = new ItemCrystallizedChunks(FZAItemInfo.CRYSTAL_ID);
 		if(ConfigurationHandler.wrathIgniterRevert) {
-			Core.registry.wrath_igniter = new ItemWrathIgniterOverride(Core.registry.wrath_igniter.itemID-256);
+			Core.registry.wrath_igniter = new ItemWrathIgniterOverride(((Item)Core.registry.wrath_igniter).itemID-256);
 		}
 	}
 	
