@@ -28,4 +28,6 @@ public class FZAItemInfo {
 	public static final String CRYSTAL_UNLOCALIZED_NAME = "fza.crystallizedChunks";
 	public static final String CRYSTAL_ICON = "crystal";
 	
+	public static final String IGNITER_ICON = "wrath_igniter";
+	
 }

@@ -2,7 +2,7 @@ package fza.base;
 
 import java.io.File;
 
-
+import net.minecraftforge.common.MinecraftForge;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
@@ -11,21 +11,19 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkMod;
-import factorization.shared.Core;
 import fza.base.config.ConfigurationHandler;
 import fza.base.items.FZAItems;
-import fza.base.items.concretes.ItemWrathIgniterOverride;
 import fza.base.proxy.CommonProxy;
 import fza.base.proxy.PacketHandler;
-import fza.base.util.ColoringUtil;
 import fza.base.util.OreDictionaryUtil;
 import fza.base.util.RecipeGymnastics;
+import fza.base.util.WrathRecipeEventHandler;
 
 @Mod(modid = "FZAddons", name = "FZAddons", version = FZAddons.VERSION, dependencies = "required-after:factorization")
 @NetworkMod(serverSideRequired = true, clientSideRequired = true, channels = { "fza" }, packetHandler = PacketHandler.class)
 public class FZAddons {
 	
-	public static final String VERSION = "0.0.1";
+	public static final String VERSION = "0.0.2";
 
 	@Instance("FZAddons")
 	public static FZAddons instance;
@@ -45,7 +43,9 @@ public class FZAddons {
 	@EventHandler
 	public void init(FMLInitializationEvent event) {
 		proxy.initRenderers();
+		MinecraftForge.EVENT_BUS.register(new WrathRecipeEventHandler());
 	}
+
 
 	@EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
@@ -54,8 +54,6 @@ public class FZAddons {
 		FZAItems.registerOreDict();
 		RecipeGymnastics.initBase();
 		RecipeGymnastics.doGymnastics();
-		if(ConfigurationHandler.wrathIgniterRevert) {
-			RecipeGymnastics.revertDarkIronRecipes();
-		}
 	}
+	
 }

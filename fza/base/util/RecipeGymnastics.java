@@ -439,8 +439,16 @@ public class RecipeGymnastics {
 	
 	private static boolean canRemoveRecipe(IRecipe r) {
 		try {
+			
 			ItemStack output = r.getRecipeOutput();
-			return (output.itemID == Core.registry.dark_iron.itemID && ItemStack.areItemStacksEqual(output, StackUtil.getDuplicateStackOfSize(9, output))) || (output.itemID == Core.registry.dark_iron_block_item.itemID && output.getItemDamage() == 3);
+			int oreID = OreDictionary.getOreID(output);
+			if(oreID != -1) {
+				String name = OreDictionary.getOreName(oreID);
+				if(name.equals("ingotFzDarkIron") || name.equals("blockFzDarkIron") && r.getRecipeSize() == 1 || r.getRecipeSize() == 9) {
+					return true;
+				}
+			}
+			return false;
 		}catch (Throwable e) {
 			return false;
 		}

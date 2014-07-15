@@ -28,6 +28,7 @@ public class FZAItems {
 		crystal = new ItemCrystallizedChunks(FZAItemInfo.CRYSTAL_ID);
 		if(ConfigurationHandler.wrathIgniterRevert) {
 			Core.registry.wrath_igniter = new ItemWrathIgniterOverride(((Item)Core.registry.wrath_igniter).itemID-256);
+			((Item)Core.registry.wrath_igniter).setUnlocalizedName("FZA:WrathIgniter");
 		}
 	}
 	
