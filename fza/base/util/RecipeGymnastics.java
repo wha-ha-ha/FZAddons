@@ -428,7 +428,7 @@ public class RecipeGymnastics {
 		while(iterator.hasNext()) {
 			IRecipe r = iterator.next();
 			if(canRemoveRecipe(r)) {
-				System.out.println("Removing recipe for "+r.getRecipeOutput().getDisplayName());
+				System.out.println("[FZAddons] Removing recipe for "+r.getRecipeOutput().getDisplayName());
 				iterator.remove();
 			}
 		}
@@ -444,7 +444,7 @@ public class RecipeGymnastics {
 			int oreID = OreDictionary.getOreID(output);
 			if(oreID != -1) {
 				String name = OreDictionary.getOreName(oreID);
-				if(name.equals("ingotFzDarkIron") || name.equals("blockFzDarkIron") && r.getRecipeSize() == 1 || r.getRecipeSize() == 9) {
+				if((name.equals("ingotFzDarkIron") || name.equals("blockFzDarkIron")) || (name.equals("ingotDarkIron") || name.equals("blockDarkIron"))) {
 					return true;
 				}
 			}
